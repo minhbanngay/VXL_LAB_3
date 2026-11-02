@@ -1,0 +1,127 @@
+<mxfile host="app.diagrams.net" modified="2026-11-02T00:00:00.000Z" agent="Codex" version="24.7.17" type="device">
+  <diagram id="lab3-ex01-fsm" name="FSM Exercise 01">
+    <mxGraphModel dx="1920" dy="1080" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1920" pageHeight="1080" math="0" shadow="0">
+      <root>
+        <mxCell id="0"/>
+        <mxCell id="1" parent="0"/>
+
+        <mxCell id="title" value="&lt;b&gt;LAB 3 – EXERCISE 1: FINITE STATE MACHINE&lt;/b&gt;&lt;br&gt;&lt;font style=&quot;font-size:14px&quot;&gt;Hệ thống đèn giao thông ngã tư: 12 LED, 4 LED 7 đoạn và 3 nút nhấn&lt;/font&gt;" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=24;fontColor=#1f2937;" vertex="1" parent="1">
+          <mxGeometry x="260" y="20" width="1400" height="55" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="panel-mode" value="&lt;b&gt;A. FSM CHỌN CHẾ ĐỘ – fsm_manual&lt;/b&gt;" style="swimlane;html=1;rounded=1;startSize=35;horizontal=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=16;fontStyle=1;swimlaneFillColor=#f8fbff;" vertex="1" parent="1">
+          <mxGeometry x="40" y="90" width="1840" height="220" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="mode1" value="&lt;b&gt;MODE 1&lt;/b&gt;&lt;br&gt;TỰ ĐỘNG&lt;br&gt;&lt;font style=&quot;font-size:12px&quot;&gt;Chạy fsm_automatic&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;strokeWidth=2;fontSize=16;" vertex="1" parent="1">
+          <mxGeometry x="105" y="155" width="270" height="95" as="geometry"/>
+        </mxCell>
+        <mxCell id="mode2" value="&lt;b&gt;MODE 2&lt;/b&gt;&lt;br&gt;CHỈNH ĐÈN ĐỎ&lt;br&gt;&lt;font style=&quot;font-size:12px&quot;&gt;Chạy fsm_setting(RED)&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;strokeWidth=2;fontSize=16;" vertex="1" parent="1">
+          <mxGeometry x="555" y="155" width="270" height="95" as="geometry"/>
+        </mxCell>
+        <mxCell id="mode3" value="&lt;b&gt;MODE 3&lt;/b&gt;&lt;br&gt;CHỈNH ĐÈN VÀNG&lt;br&gt;&lt;font style=&quot;font-size:12px&quot;&gt;Chạy fsm_setting(AMBER)&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;strokeWidth=2;fontSize=16;" vertex="1" parent="1">
+          <mxGeometry x="1005" y="155" width="270" height="95" as="geometry"/>
+        </mxCell>
+        <mxCell id="mode4" value="&lt;b&gt;MODE 4&lt;/b&gt;&lt;br&gt;CHỈNH ĐÈN XANH&lt;br&gt;&lt;font style=&quot;font-size:12px&quot;&gt;Chạy fsm_setting(GREEN)&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;strokeWidth=2;fontSize=16;" vertex="1" parent="1">
+          <mxGeometry x="1455" y="155" width="270" height="95" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="edge-mode12" value="Nhấn MODE" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=1;strokeWidth=2;fontSize=13;" edge="1" parent="1" source="mode1" target="mode2">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="edge-mode23" value="Nhấn MODE" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=1;strokeWidth=2;fontSize=13;" edge="1" parent="1" source="mode2" target="mode3">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="edge-mode34" value="Nhấn MODE" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=1;strokeWidth=2;fontSize=13;" edge="1" parent="1" source="mode3" target="mode4">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="edge-mode41" value="Nhấn MODE" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=1;strokeWidth=2;fontSize=13;exitX=0.5;exitY=1;entryX=0.5;entryY=1;" edge="1" parent="1" source="mode4" target="mode1">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="1590" y="285"/>
+              <mxPoint x="240" y="285"/>
+            </Array>
+          </mxGeometry>
+        </mxCell>
+
+        <mxCell id="panel-auto" value="&lt;b&gt;B. FSM CHẠY TỰ ĐỘNG – fsm_automatic (MODE 1)&lt;/b&gt;" style="swimlane;html=1;rounded=1;startSize=35;horizontal=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=16;fontStyle=1;swimlaneFillColor=#fbfffb;" vertex="1" parent="1">
+          <mxGeometry x="40" y="330" width="1840" height="340" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="auto-ns-green" value="&lt;b&gt;A0 – BẮC/NAM XANH&lt;/b&gt;&lt;br&gt;Bắc–Nam: XANH&lt;br&gt;Đông–Tây: ĐỎ&lt;br&gt;&lt;font style=&quot;font-size:12px&quot;&gt;7 đoạn hiển thị thời gian còn lại&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;strokeWidth=2;fontSize=15;" vertex="1" parent="1">
+          <mxGeometry x="120" y="400" width="430" height="105" as="geometry"/>
+        </mxCell>
+        <mxCell id="auto-ns-amber" value="&lt;b&gt;A1 – BẮC/NAM VÀNG&lt;/b&gt;&lt;br&gt;Bắc–Nam: VÀNG&lt;br&gt;Đông–Tây: ĐỎ&lt;br&gt;&lt;font style=&quot;font-size:12px&quot;&gt;7 đoạn tiếp tục đếm ngược&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;strokeWidth=2;fontSize=15;" vertex="1" parent="1">
+          <mxGeometry x="1370" y="400" width="430" height="105" as="geometry"/>
+        </mxCell>
+        <mxCell id="auto-ew-green" value="&lt;b&gt;A2 – ĐÔNG/TÂY XANH&lt;/b&gt;&lt;br&gt;Bắc–Nam: ĐỎ&lt;br&gt;Đông–Tây: XANH&lt;br&gt;&lt;font style=&quot;font-size:12px&quot;&gt;7 đoạn hiển thị thời gian còn lại&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;strokeWidth=2;fontSize=15;" vertex="1" parent="1">
+          <mxGeometry x="1370" y="540" width="430" height="105" as="geometry"/>
+        </mxCell>
+        <mxCell id="auto-ew-amber" value="&lt;b&gt;A3 – ĐÔNG/TÂY VÀNG&lt;/b&gt;&lt;br&gt;Bắc–Nam: ĐỎ&lt;br&gt;Đông–Tây: VÀNG&lt;br&gt;&lt;font style=&quot;font-size:12px&quot;&gt;7 đoạn tiếp tục đếm ngược&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;strokeWidth=2;fontSize=15;" vertex="1" parent="1">
+          <mxGeometry x="120" y="540" width="430" height="105" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="edge-auto01" value="Hết thời gian XANH" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;endFill=1;strokeWidth=2;fontSize=13;" edge="1" parent="1" source="auto-ns-green" target="auto-ns-amber">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="edge-auto12" value="Hết thời gian VÀNG" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;endFill=1;strokeWidth=2;fontSize=13;" edge="1" parent="1" source="auto-ns-amber" target="auto-ew-green">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="edge-auto23" value="Hết thời gian XANH" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;endFill=1;strokeWidth=2;fontSize=13;" edge="1" parent="1" source="auto-ew-green" target="auto-ew-amber">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="edge-auto30" value="Hết thời gian VÀNG" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;endFill=1;strokeWidth=2;fontSize=13;" edge="1" parent="1" source="auto-ew-amber" target="auto-ns-green">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="auto-note" value="&lt;b&gt;Nguyên tắc an toàn:&lt;/b&gt; hai tuyến đường không bao giờ cùng XANH. Bắc–Nam hoạt động giống nhau; Đông–Tây hoạt động giống nhau." style="shape=note;whiteSpace=wrap;html=1;backgroundOutline=1;fillColor=#e1d5e7;strokeColor=#9673a6;fontSize=13;" vertex="1" parent="1">
+          <mxGeometry x="690" y="520" width="540" height="95" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="panel-setting" value="&lt;b&gt;C. FSM CHỈNH THỜI GIAN – fsm_setting (MODE 2, 3, 4)&lt;/b&gt;" style="swimlane;html=1;rounded=1;startSize=35;horizontal=1;fillColor=#e1d5e7;strokeColor=#9673a6;fontSize=16;fontStyle=1;swimlaneFillColor=#fdfbff;" vertex="1" parent="1">
+          <mxGeometry x="40" y="690" width="1840" height="330" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="setting-enter" value="&lt;b&gt;S0 – VÀO MODE CHỈNH&lt;/b&gt;&lt;br&gt;Chọn màu theo mode&lt;br&gt;Đọc giá trị hiện tại vào candidate" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;strokeWidth=2;fontSize=15;" vertex="1" parent="1">
+          <mxGeometry x="110" y="790" width="330" height="105" as="geometry"/>
+        </mxCell>
+        <mxCell id="setting-edit" value="&lt;b&gt;S1 – ĐANG CHỈNH&lt;/b&gt;&lt;br&gt;4 LED của màu được chọn nhấp nháy 2 Hz&lt;br&gt;Hai LED 7 đoạn: MODE&lt;br&gt;Hai LED 7 đoạn: candidate (1–99)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;strokeWidth=2;fontSize=15;" vertex="1" parent="1">
+          <mxGeometry x="650" y="765" width="570" height="150" as="geometry"/>
+        </mxCell>
+        <mxCell id="setting-save" value="&lt;b&gt;S2 – LƯU GIÁ TRỊ&lt;/b&gt;&lt;br&gt;Ghi candidate vào thời gian&lt;br&gt;ĐỎ / VÀNG / XANH tương ứng" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;strokeWidth=2;fontSize=15;" vertex="1" parent="1">
+          <mxGeometry x="1430" y="790" width="340" height="105" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="edge-setting-enter" value="Khởi tạo xong" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;endFill=1;strokeWidth=2;fontSize=13;" edge="1" parent="1" source="setting-enter" target="setting-edit">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="edge-setting-modify" value="Nhấn MODIFY: candidate = candidate % 99 + 1" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=1;strokeWidth=2;fontSize=13;exitX=0.35;exitY=0;entryX=0.65;entryY=0;" edge="1" parent="1" source="setting-edit" target="setting-edit">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="850" y="730"/>
+              <mxPoint x="1020" y="730"/>
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="edge-setting-save" value="Nhấn SET" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;endFill=1;strokeWidth=2;fontSize=13;" edge="1" parent="1" source="setting-edit" target="setting-save">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="edge-setting-return" value="Lưu xong, tiếp tục ở mode hiện tại" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;endFill=1;strokeWidth=2;fontSize=13;exitX=0.5;exitY=1;entryX=0.8;entryY=1;" edge="1" parent="1" source="setting-save" target="setting-edit">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="1600" y="965"/>
+              <mxPoint x="1100" y="965"/>
+            </Array>
+          </mxGeometry>
+        </mxCell>
+
+        <mxCell id="setting-note" value="Nhấn MODE ở bất kỳ mode chỉnh nào → FSM chọn chế độ chuyển sang mode kế tiếp. Chỉ nút MODE thay đổi mode." style="shape=note;whiteSpace=wrap;html=1;backgroundOutline=1;fillColor=#f8cecc;strokeColor=#b85450;fontSize=13;" vertex="1" parent="1">
+          <mxGeometry x="110" y="925" width="430" height="65" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="legend" value="&lt;b&gt;Sự kiện:&lt;/b&gt; nút nhấn chỉ hợp lệ sau chống dội • &lt;b&gt;Timer:&lt;/b&gt; cập nhật từ ngắt TIM2 mỗi 10 ms • &lt;b&gt;Phần cứng:&lt;/b&gt; mọi thao tác LED đi qua traffic_light" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=1;fillColor=#f5f5f5;strokeColor=#666666;fontSize=13;" vertex="1" parent="1">
+          <mxGeometry x="560" y="940" width="760" height="50" as="geometry"/>
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
