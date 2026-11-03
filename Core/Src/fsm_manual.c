@@ -25,6 +25,7 @@ void fsm_manual_run(void)
     else
     {
       fsm_setting_exit();
+      fsm_automatic_init();
     }
   }
 
