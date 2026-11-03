@@ -8,7 +8,6 @@
 #include <stdbool.h>
 #include <stdint.h>
 
-#define SETTING_BLINK_TIMER_ID 0U
 #define SETTING_BLINK_HALF_PERIOD_MS 250U
 
 static uint8_t candidate_value;
@@ -19,7 +18,7 @@ void fsm_setting_init(void)
 {
   setting_entry_flag = true;
   blink_visible = false;
-  software_timer_cancel(SETTING_BLINK_TIMER_ID);
+  setTimer(0);
 }
 
 void fsm_setting_run(void)
@@ -37,8 +36,7 @@ void fsm_setting_run(void)
         traffic_light_all_off();
         traffic_light_set_blink(TRAFFIC_RED, blink_visible);
         traffic_light_display_setting(2U, candidate_value);
-        software_timer_set(SETTING_BLINK_TIMER_ID,
-                           SETTING_BLINK_HALF_PERIOD_MS);
+        setTimer(SETTING_BLINK_HALF_PERIOD_MS);
         setting_entry_flag = false;
       }
       if (modify_pressed)
@@ -53,12 +51,11 @@ void fsm_setting_run(void)
       {
         (void)global_set_duration(TRAFFIC_RED, candidate_value);
       }
-      if (software_timer_expired(SETTING_BLINK_TIMER_ID))
+      if (timer_flag == 1)
       {
         blink_visible = !blink_visible;
         traffic_light_set_blink(TRAFFIC_RED, blink_visible);
-        software_timer_set(SETTING_BLINK_TIMER_ID,
-                           SETTING_BLINK_HALF_PERIOD_MS);
+        setTimer(SETTING_BLINK_HALF_PERIOD_MS);
       }
       traffic_light_display_setting(2U, candidate_value);
       break;
@@ -71,8 +68,7 @@ void fsm_setting_run(void)
         traffic_light_all_off();
         traffic_light_set_blink(TRAFFIC_AMBER, blink_visible);
         traffic_light_display_setting(3U, candidate_value);
-        software_timer_set(SETTING_BLINK_TIMER_ID,
-                           SETTING_BLINK_HALF_PERIOD_MS);
+        setTimer(SETTING_BLINK_HALF_PERIOD_MS);
         setting_entry_flag = false;
       }
       if (modify_pressed)
@@ -87,12 +83,11 @@ void fsm_setting_run(void)
       {
         (void)global_set_duration(TRAFFIC_AMBER, candidate_value);
       }
-      if (software_timer_expired(SETTING_BLINK_TIMER_ID))
+      if (timer_flag == 1)
       {
         blink_visible = !blink_visible;
         traffic_light_set_blink(TRAFFIC_AMBER, blink_visible);
-        software_timer_set(SETTING_BLINK_TIMER_ID,
-                           SETTING_BLINK_HALF_PERIOD_MS);
+        setTimer(SETTING_BLINK_HALF_PERIOD_MS);
       }
       traffic_light_display_setting(3U, candidate_value);
       break;
@@ -105,8 +100,7 @@ void fsm_setting_run(void)
         traffic_light_all_off();
         traffic_light_set_blink(TRAFFIC_GREEN, blink_visible);
         traffic_light_display_setting(4U, candidate_value);
-        software_timer_set(SETTING_BLINK_TIMER_ID,
-                           SETTING_BLINK_HALF_PERIOD_MS);
+        setTimer(SETTING_BLINK_HALF_PERIOD_MS);
         setting_entry_flag = false;
       }
       if (modify_pressed)
@@ -121,12 +115,11 @@ void fsm_setting_run(void)
       {
         (void)global_set_duration(TRAFFIC_GREEN, candidate_value);
       }
-      if (software_timer_expired(SETTING_BLINK_TIMER_ID))
+      if (timer_flag == 1)
       {
         blink_visible = !blink_visible;
         traffic_light_set_blink(TRAFFIC_GREEN, blink_visible);
-        software_timer_set(SETTING_BLINK_TIMER_ID,
-                           SETTING_BLINK_HALF_PERIOD_MS);
+        setTimer(SETTING_BLINK_HALF_PERIOD_MS);
       }
       traffic_light_display_setting(4U, candidate_value);
       break;

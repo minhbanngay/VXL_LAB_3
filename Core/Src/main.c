@@ -98,7 +98,6 @@ int main(void)
   /* USER CODE BEGIN 2 */
 
   global_init();
-  software_timer_init();
   button_init();
   traffic_light_init();
   fsm_manual_init();
@@ -265,7 +264,7 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 {
   if (htim->Instance == TIM2)
   {
-    software_timer_tick(SYSTEM_TICK_MS);
+    timerRun();
     button_tick();
     traffic_light_refresh_10ms();
   }

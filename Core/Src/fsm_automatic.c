@@ -7,7 +7,6 @@
 #include <stdbool.h>
 #include <stdint.h>
 
-#define AUTOMATIC_TIMER_ID 1U
 #define ONE_SECOND_MS 1000U
 
 typedef enum
@@ -28,7 +27,7 @@ void fsm_automatic_init(void)
 {
   automatic_state = AUTO_NS_GREEN_EW_RED;
   automatic_entry_flag = true;
-  software_timer_cancel(AUTOMATIC_TIMER_ID);
+  setTimer(0);
   traffic_light_all_off();
 }
 
@@ -48,10 +47,10 @@ void fsm_automatic_run(void)
         traffic_light_set_road(TRAFFIC_EAST_WEST, TRAFFIC_RED);
         traffic_light_display_times(north_south_countdown,
                                     east_west_countdown);
-        software_timer_set(AUTOMATIC_TIMER_ID, ONE_SECOND_MS);
+        setTimer(ONE_SECOND_MS);
         automatic_entry_flag = false;
       }
-      if (!software_timer_expired(AUTOMATIC_TIMER_ID))
+      if (timer_flag == 0)
       {
         break;
       }
@@ -71,7 +70,7 @@ void fsm_automatic_run(void)
       {
         traffic_light_display_times(north_south_countdown,
                                     east_west_countdown);
-        software_timer_set(AUTOMATIC_TIMER_ID, ONE_SECOND_MS);
+        setTimer(ONE_SECOND_MS);
         break;
       }
       automatic_state = AUTO_NS_AMBER_EW_RED;
@@ -87,10 +86,10 @@ void fsm_automatic_run(void)
         traffic_light_set_road(TRAFFIC_EAST_WEST, TRAFFIC_RED);
         traffic_light_display_times(north_south_countdown,
                                     east_west_countdown);
-        software_timer_set(AUTOMATIC_TIMER_ID, ONE_SECOND_MS);
+        setTimer(ONE_SECOND_MS);
         automatic_entry_flag = false;
       }
-      if (!software_timer_expired(AUTOMATIC_TIMER_ID))
+      if (timer_flag == 0)
       {
         break;
       }
@@ -110,7 +109,7 @@ void fsm_automatic_run(void)
       {
         traffic_light_display_times(north_south_countdown,
                                     east_west_countdown);
-        software_timer_set(AUTOMATIC_TIMER_ID, ONE_SECOND_MS);
+        setTimer(ONE_SECOND_MS);
         break;
       }
       automatic_state = AUTO_NS_RED_EW_GREEN;
@@ -127,10 +126,10 @@ void fsm_automatic_run(void)
         traffic_light_set_road(TRAFFIC_EAST_WEST, TRAFFIC_GREEN);
         traffic_light_display_times(north_south_countdown,
                                     east_west_countdown);
-        software_timer_set(AUTOMATIC_TIMER_ID, ONE_SECOND_MS);
+        setTimer(ONE_SECOND_MS);
         automatic_entry_flag = false;
       }
-      if (!software_timer_expired(AUTOMATIC_TIMER_ID))
+      if (timer_flag == 0)
       {
         break;
       }
@@ -150,7 +149,7 @@ void fsm_automatic_run(void)
       {
         traffic_light_display_times(north_south_countdown,
                                     east_west_countdown);
-        software_timer_set(AUTOMATIC_TIMER_ID, ONE_SECOND_MS);
+        setTimer(ONE_SECOND_MS);
         break;
       }
       automatic_state = AUTO_NS_RED_EW_AMBER;
@@ -166,10 +165,10 @@ void fsm_automatic_run(void)
         traffic_light_set_road(TRAFFIC_EAST_WEST, TRAFFIC_AMBER);
         traffic_light_display_times(north_south_countdown,
                                     east_west_countdown);
-        software_timer_set(AUTOMATIC_TIMER_ID, ONE_SECOND_MS);
+        setTimer(ONE_SECOND_MS);
         automatic_entry_flag = false;
       }
-      if (!software_timer_expired(AUTOMATIC_TIMER_ID))
+      if (timer_flag == 0)
       {
         break;
       }
@@ -189,7 +188,7 @@ void fsm_automatic_run(void)
       {
         traffic_light_display_times(north_south_countdown,
                                     east_west_countdown);
-        software_timer_set(AUTOMATIC_TIMER_ID, ONE_SECOND_MS);
+        setTimer(ONE_SECOND_MS);
         break;
       }
       automatic_state = AUTO_NS_GREEN_EW_RED;
