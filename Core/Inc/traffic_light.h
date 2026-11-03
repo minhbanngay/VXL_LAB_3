@@ -1,28 +1,16 @@
 #ifndef TRAFFIC_LIGHT_H
 #define TRAFFIC_LIGHT_H
 
+#include "global.h"
+
 #include <stdbool.h>
 #include <stdint.h>
-
-typedef enum
-{
-  TRAFFIC_RED = 0,
-  TRAFFIC_AMBER,
-  TRAFFIC_GREEN
-} TrafficColor;
 
 typedef enum
 {
   TRAFFIC_NORTH_SOUTH = 0,
   TRAFFIC_EAST_WEST
 } TrafficRoad;
-
-typedef struct
-{
-  uint8_t red_seconds;
-  uint8_t amber_seconds;
-  uint8_t green_seconds;
-} TrafficTiming;
 
 void traffic_light_init(void);
 void traffic_light_all_off(void);

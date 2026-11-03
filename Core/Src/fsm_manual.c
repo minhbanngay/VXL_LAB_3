@@ -3,31 +3,19 @@
 #include "button.h"
 #include "fsm_automatic.h"
 #include "fsm_setting.h"
-#include "traffic_light.h"
-
-static SystemMode current_mode;
-static TrafficTiming timing;
 
 void fsm_manual_init(void)
 {
-  current_mode = MODE_AUTOMATIC;
-  timing = (TrafficTiming){
-    .red_seconds = 5U,
-    .amber_seconds = 2U,
-    .green_seconds = 3U
-  };
-
-  fsm_automatic_init(&timing);
-  fsm_setting_init(&timing);
+  fsm_automatic_init();
+  fsm_setting_init();
 }
 
 void fsm_manual_run(void)
 {
   if (button_was_pressed(BUTTON_MODE))
   {
-    current_mode = (current_mode == MODE_SET_GREEN)
-                     ? MODE_AUTOMATIC
-                     : (SystemMode)(current_mode + 1);
+    global_next_mode();
+    SystemMode current_mode = global_get_mode();
 
     if (current_mode != MODE_AUTOMATIC)
     {
@@ -35,6 +23,8 @@ void fsm_manual_run(void)
                         (uint8_t)current_mode);
     }
   }
+
+  SystemMode current_mode = global_get_mode();
 
   if (current_mode == MODE_AUTOMATIC)
   {
@@ -48,5 +38,5 @@ void fsm_manual_run(void)
 
 SystemMode fsm_manual_get_mode(void)
 {
-  return current_mode;
+  return global_get_mode();
 }
