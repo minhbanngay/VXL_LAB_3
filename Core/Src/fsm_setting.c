@@ -16,8 +16,7 @@ static bool blink_visible;
 
 static bool setting_color_is_editable(void)
 {
-  return (selected_color == TRAFFIC_RED) ||
-         (selected_color == TRAFFIC_AMBER);
+  return selected_color <= TRAFFIC_GREEN;
 }
 
 void fsm_setting_init(void)
