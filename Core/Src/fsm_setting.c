@@ -1,5 +1,6 @@
 #include "fsm_setting.h"
 
+#include "button.h"
 #include "software_timer.h"
 #include "traffic_light.h"
 
@@ -12,6 +13,11 @@ static TrafficColor selected_color;
 static uint8_t selected_mode;
 static uint8_t candidate_value;
 static bool blink_visible;
+
+static bool setting_color_is_editable(void)
+{
+  return selected_color == TRAFFIC_RED;
+}
 
 void fsm_setting_init(void)
 {
@@ -38,6 +44,24 @@ void fsm_setting_enter(TrafficColor color, uint8_t mode)
 
 void fsm_setting_run(void)
 {
+  bool modify_pressed = button_was_pressed(BUTTON_MODIFY);
+  bool set_pressed = button_was_pressed(BUTTON_SET);
+
+  if (setting_color_is_editable())
+  {
+    if (modify_pressed)
+    {
+      candidate_value = (candidate_value >= TRAFFIC_TIME_MAX_SECONDS)
+                          ? TRAFFIC_TIME_MIN_SECONDS
+                          : (uint8_t)(candidate_value + 1U);
+    }
+
+    if (set_pressed)
+    {
+      (void)global_set_duration(selected_color, candidate_value);
+    }
+  }
+
   if (software_timer_expired(SETTING_BLINK_TIMER_ID))
   {
     blink_visible = !blink_visible;
