@@ -6,8 +6,6 @@
 
 #include <stdint.h>
 
-#define ONE_SECOND_MS 1000U
-
 typedef enum
 {
   AUTO_NS_GREEN_EW_RED = 0,
@@ -32,7 +30,7 @@ void fsm_automatic_init(void)
   traffic_light_show_automatic(TRAFFIC_GREEN, TRAFFIC_RED,
                                north_south_countdown,
                                east_west_countdown);
-  setTimer(ONE_SECOND_MS);
+  setTimer(1000);
 }
 
 void fsm_automatic_run(void)
@@ -46,24 +44,15 @@ void fsm_automatic_run(void)
       {
         break;
       }
-      if (north_south_countdown > 0U)
-      {
-        --north_south_countdown;
-      }
-      if (east_west_countdown > 0U)
-      {
-        --east_west_countdown;
-      }
-      if (phase_countdown > 0U)
-      {
-        --phase_countdown;
-      }
+      if (north_south_countdown > 0U) --north_south_countdown;
+      if (east_west_countdown > 0U) --east_west_countdown;
+      --phase_countdown;
       if (phase_countdown > 0U)
       {
         traffic_light_show_automatic(TRAFFIC_GREEN, TRAFFIC_RED,
                                      north_south_countdown,
                                      east_west_countdown);
-        setTimer(ONE_SECOND_MS);
+        setTimer(1000);
         break;
       }
       automatic_state = AUTO_NS_AMBER_EW_RED;
@@ -72,7 +61,7 @@ void fsm_automatic_run(void)
       traffic_light_show_automatic(TRAFFIC_AMBER, TRAFFIC_RED,
                                    north_south_countdown,
                                    east_west_countdown);
-      setTimer(ONE_SECOND_MS);
+      setTimer(1000);
       break;
 
     case AUTO_NS_AMBER_EW_RED:
@@ -80,24 +69,15 @@ void fsm_automatic_run(void)
       {
         break;
       }
-      if (north_south_countdown > 0U)
-      {
-        --north_south_countdown;
-      }
-      if (east_west_countdown > 0U)
-      {
-        --east_west_countdown;
-      }
-      if (phase_countdown > 0U)
-      {
-        --phase_countdown;
-      }
+      if (north_south_countdown > 0U) --north_south_countdown;
+      if (east_west_countdown > 0U) --east_west_countdown;
+      --phase_countdown;
       if (phase_countdown > 0U)
       {
         traffic_light_show_automatic(TRAFFIC_AMBER, TRAFFIC_RED,
                                      north_south_countdown,
                                      east_west_countdown);
-        setTimer(ONE_SECOND_MS);
+        setTimer(1000);
         break;
       }
       automatic_state = AUTO_NS_RED_EW_GREEN;
@@ -107,7 +87,7 @@ void fsm_automatic_run(void)
       traffic_light_show_automatic(TRAFFIC_RED, TRAFFIC_GREEN,
                                    north_south_countdown,
                                    east_west_countdown);
-      setTimer(ONE_SECOND_MS);
+      setTimer(1000);
       break;
 
     case AUTO_NS_RED_EW_GREEN:
@@ -115,24 +95,15 @@ void fsm_automatic_run(void)
       {
         break;
       }
-      if (north_south_countdown > 0U)
-      {
-        --north_south_countdown;
-      }
-      if (east_west_countdown > 0U)
-      {
-        --east_west_countdown;
-      }
-      if (phase_countdown > 0U)
-      {
-        --phase_countdown;
-      }
+      if (north_south_countdown > 0U) --north_south_countdown;
+      if (east_west_countdown > 0U) --east_west_countdown;
+      --phase_countdown;
       if (phase_countdown > 0U)
       {
         traffic_light_show_automatic(TRAFFIC_RED, TRAFFIC_GREEN,
                                      north_south_countdown,
                                      east_west_countdown);
-        setTimer(ONE_SECOND_MS);
+        setTimer(1000);
         break;
       }
       automatic_state = AUTO_NS_RED_EW_AMBER;
@@ -141,7 +112,7 @@ void fsm_automatic_run(void)
       traffic_light_show_automatic(TRAFFIC_RED, TRAFFIC_AMBER,
                                    north_south_countdown,
                                    east_west_countdown);
-      setTimer(ONE_SECOND_MS);
+      setTimer(1000);
       break;
 
     case AUTO_NS_RED_EW_AMBER:
@@ -149,24 +120,15 @@ void fsm_automatic_run(void)
       {
         break;
       }
-      if (north_south_countdown > 0U)
-      {
-        --north_south_countdown;
-      }
-      if (east_west_countdown > 0U)
-      {
-        --east_west_countdown;
-      }
-      if (phase_countdown > 0U)
-      {
-        --phase_countdown;
-      }
+      if (north_south_countdown > 0U) --north_south_countdown;
+      if (east_west_countdown > 0U) --east_west_countdown;
+      --phase_countdown;
       if (phase_countdown > 0U)
       {
         traffic_light_show_automatic(TRAFFIC_RED, TRAFFIC_AMBER,
                                      north_south_countdown,
                                      east_west_countdown);
-        setTimer(ONE_SECOND_MS);
+        setTimer(1000);
         break;
       }
       automatic_state = AUTO_NS_GREEN_EW_RED;
@@ -176,7 +138,7 @@ void fsm_automatic_run(void)
       traffic_light_show_automatic(TRAFFIC_GREEN, TRAFFIC_RED,
                                    north_south_countdown,
                                    east_west_countdown);
-      setTimer(ONE_SECOND_MS);
+      setTimer(1000);
       break;
 
     default:
@@ -187,7 +149,7 @@ void fsm_automatic_run(void)
       traffic_light_show_automatic(TRAFFIC_GREEN, TRAFFIC_RED,
                                    north_south_countdown,
                                    east_west_countdown);
-      setTimer(ONE_SECOND_MS);
+      setTimer(1000);
       break;
   }
 }
