@@ -22,6 +22,10 @@ void fsm_manual_run(void)
       fsm_setting_enter((TrafficColor)(current_mode - MODE_SET_RED),
                         (uint8_t)current_mode);
     }
+    else
+    {
+      fsm_setting_exit();
+    }
   }
 
   SystemMode current_mode = global_get_mode();
