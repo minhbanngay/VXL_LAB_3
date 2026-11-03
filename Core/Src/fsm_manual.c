@@ -7,7 +7,6 @@
 void fsm_manual_init(void)
 {
   fsm_automatic_init();
-  fsm_setting_init();
 }
 
 void fsm_manual_run(void)
@@ -15,29 +14,34 @@ void fsm_manual_run(void)
   if (button_was_pressed(BUTTON_MODE))
   {
     global_next_mode();
-    SystemMode current_mode = global_get_mode();
 
-    if (current_mode != MODE_AUTOMATIC)
+    if (global_get_mode() == MODE_AUTOMATIC)
     {
-      fsm_setting_enter((TrafficColor)(current_mode - MODE_SET_RED),
-                        (uint8_t)current_mode);
-    }
-    else
-    {
-      fsm_setting_exit();
       fsm_automatic_init();
     }
+
+    if (global_get_mode() != MODE_AUTOMATIC)
+    {
+      fsm_setting_init();
+    }
   }
 
-  SystemMode current_mode = global_get_mode();
+  switch (global_get_mode())
+  {
+    case MODE_AUTOMATIC:
+      fsm_automatic_run();
+      break;
 
-  if (current_mode == MODE_AUTOMATIC)
-  {
-    fsm_automatic_run();
-  }
-  else
-  {
-    fsm_setting_run();
+    case MODE_SET_RED:
+    case MODE_SET_AMBER:
+    case MODE_SET_GREEN:
+      fsm_setting_run();
+      break;
+
+    default:
+      global_set_mode(MODE_AUTOMATIC);
+      fsm_automatic_init();
+      break;
   }
 }
 

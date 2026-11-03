@@ -1,45 +1,48 @@
 #include "fsm_setting.h"
 
 #include "button.h"
+#include "global.h"
 #include "software_timer.h"
 #include "traffic_light.h"
 
 #include <stdbool.h>
+#include <stdint.h>
 
-#define SETTING_BLINK_TIMER_ID 0U
 #define SETTING_BLINK_HALF_PERIOD_MS 250U
 
-static TrafficColor selected_color;
-static uint8_t selected_mode;
 static uint8_t candidate_value;
 static bool blink_visible;
 
-static bool setting_color_is_editable(void)
-{
-  return selected_color <= TRAFFIC_GREEN;
-}
-
 void fsm_setting_init(void)
 {
-  selected_color = TRAFFIC_RED;
-  selected_mode = 2U;
-  candidate_value = global_get_duration(selected_color);
-  blink_visible = false;
-  software_timer_cancel(SETTING_BLINK_TIMER_ID);
-}
-
-void fsm_setting_enter(TrafficColor color, uint8_t mode)
-{
-  selected_color = color;
-  selected_mode = mode;
-  candidate_value = global_get_duration(color);
   blink_visible = true;
 
-  traffic_light_all_off();
-  traffic_light_set_blink(selected_color, blink_visible);
-  traffic_light_display_setting(selected_mode, candidate_value);
-  software_timer_set(SETTING_BLINK_TIMER_ID,
-                     SETTING_BLINK_HALF_PERIOD_MS);
+  switch (global_get_mode())
+  {
+    case MODE_SET_RED:
+      candidate_value = global_get_duration(TRAFFIC_RED);
+      traffic_light_show_setting(TRAFFIC_RED, 2U, candidate_value,
+                                 blink_visible);
+      break;
+
+    case MODE_SET_AMBER:
+      candidate_value = global_get_duration(TRAFFIC_AMBER);
+      traffic_light_show_setting(TRAFFIC_AMBER, 3U, candidate_value,
+                                 blink_visible);
+      break;
+
+    case MODE_SET_GREEN:
+      candidate_value = global_get_duration(TRAFFIC_GREEN);
+      traffic_light_show_setting(TRAFFIC_GREEN, 4U, candidate_value,
+                                 blink_visible);
+      break;
+
+    case MODE_AUTOMATIC:
+    default:
+      break;
+  }
+
+  setTimer(SETTING_BLINK_HALF_PERIOD_MS);
 }
 
 void fsm_setting_run(void)
@@ -47,36 +50,76 @@ void fsm_setting_run(void)
   bool modify_pressed = button_was_pressed(BUTTON_MODIFY);
   bool set_pressed = button_was_pressed(BUTTON_SET);
 
-  if (setting_color_is_editable())
+  switch (global_get_mode())
   {
-    if (modify_pressed)
-    {
-      candidate_value = (candidate_value >= TRAFFIC_TIME_MAX_SECONDS)
-                          ? TRAFFIC_TIME_MIN_SECONDS
-                          : (uint8_t)(candidate_value + 1U);
-    }
+    case MODE_SET_RED:
+      if (modify_pressed)
+      {
+        ++candidate_value;
+        if (candidate_value > TRAFFIC_TIME_MAX_SECONDS)
+        {
+          candidate_value = TRAFFIC_TIME_MIN_SECONDS;
+        }
+      }
+      if (set_pressed)
+      {
+        (void)global_set_duration(TRAFFIC_RED, candidate_value);
+      }
+      if (timer_flag == 1)
+      {
+        blink_visible = !blink_visible;
+        setTimer(SETTING_BLINK_HALF_PERIOD_MS);
+      }
+      traffic_light_show_setting(TRAFFIC_RED, 2U, candidate_value,
+                                 blink_visible);
+      break;
 
-    if (set_pressed)
-    {
-      (void)global_set_duration(selected_color, candidate_value);
-    }
+    case MODE_SET_AMBER:
+      if (modify_pressed)
+      {
+        ++candidate_value;
+        if (candidate_value > TRAFFIC_TIME_MAX_SECONDS)
+        {
+          candidate_value = TRAFFIC_TIME_MIN_SECONDS;
+        }
+      }
+      if (set_pressed)
+      {
+        (void)global_set_duration(TRAFFIC_AMBER, candidate_value);
+      }
+      if (timer_flag == 1)
+      {
+        blink_visible = !blink_visible;
+        setTimer(SETTING_BLINK_HALF_PERIOD_MS);
+      }
+      traffic_light_show_setting(TRAFFIC_AMBER, 3U, candidate_value,
+                                 blink_visible);
+      break;
+
+    case MODE_SET_GREEN:
+      if (modify_pressed)
+      {
+        ++candidate_value;
+        if (candidate_value > TRAFFIC_TIME_MAX_SECONDS)
+        {
+          candidate_value = TRAFFIC_TIME_MIN_SECONDS;
+        }
+      }
+      if (set_pressed)
+      {
+        (void)global_set_duration(TRAFFIC_GREEN, candidate_value);
+      }
+      if (timer_flag == 1)
+      {
+        blink_visible = !blink_visible;
+        setTimer(SETTING_BLINK_HALF_PERIOD_MS);
+      }
+      traffic_light_show_setting(TRAFFIC_GREEN, 4U, candidate_value,
+                                 blink_visible);
+      break;
+
+    case MODE_AUTOMATIC:
+    default:
+      break;
   }
-
-  if (software_timer_expired(SETTING_BLINK_TIMER_ID))
-  {
-    blink_visible = !blink_visible;
-    traffic_light_set_blink(selected_color, blink_visible);
-    software_timer_set(SETTING_BLINK_TIMER_ID,
-                       SETTING_BLINK_HALF_PERIOD_MS);
-  }
-
-  traffic_light_display_setting(selected_mode, candidate_value);
-}
-
-void fsm_setting_exit(void)
-{
-  software_timer_cancel(SETTING_BLINK_TIMER_ID);
-  blink_visible = false;
-  traffic_light_all_off();
-  traffic_light_display_clear();
 }

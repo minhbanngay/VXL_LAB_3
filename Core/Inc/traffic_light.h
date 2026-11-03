@@ -6,19 +6,13 @@
 #include <stdbool.h>
 #include <stdint.h>
 
-typedef enum
-{
-  TRAFFIC_NORTH_SOUTH = 0,
-  TRAFFIC_EAST_WEST
-} TrafficRoad;
-
 void traffic_light_init(void);
-void traffic_light_all_off(void);
-void traffic_light_set_road(TrafficRoad road, TrafficColor color);
-void traffic_light_set_blink(TrafficColor color, bool visible);
-void traffic_light_display_times(uint8_t north_south, uint8_t east_west);
-void traffic_light_display_setting(uint8_t mode, uint8_t value);
-void traffic_light_display_clear(void);
+void traffic_light_show_automatic(TrafficColor north_south_color,
+                                  TrafficColor east_west_color,
+                                  uint8_t north_south_time,
+                                  uint8_t east_west_time);
+void traffic_light_show_setting(TrafficColor color, uint8_t mode,
+                                uint8_t value, bool visible);
 void traffic_light_refresh_10ms(void);
 
 #endif /* TRAFFIC_LIGHT_H */
