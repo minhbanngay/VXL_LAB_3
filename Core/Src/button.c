@@ -1,30 +1,44 @@
 #include "button.h"
+#include "main.h"
+
+#include <stddef.h>
 
 #define BUTTON_DEBOUNCE_SAMPLES 2U
 #define BUTTON_LONG_PRESS_TICKS 100U
 
 typedef struct
 {
+  GPIO_TypeDef *port;
+  uint16_t pin;
+  GPIO_PinState pressed_level;
+} ButtonConfig;
+
+typedef struct
+{
   ButtonConfig config;
   GPIO_PinState previous_raw;
-  GPIO_PinState stable_state;
+  volatile GPIO_PinState stable_state;
   uint8_t matching_samples;
   uint16_t pressed_ticks;
-  bool press_event;
-  bool long_press_event;
+  volatile bool press_event;
+  volatile bool long_press_event;
   bool configured;
 } ButtonData;
 
 static ButtonData buttons[BUTTON_COUNT];
 
-void button_init(const ButtonConfig configs[BUTTON_COUNT])
+static const ButtonConfig button_configs[BUTTON_COUNT] = {
+  [BUTTON_MODE] = {MODE_GPIO_Port, MODE_Pin, GPIO_PIN_RESET},
+  [BUTTON_MODIFY] = {MODIFY_GPIO_Port, MODIFY_Pin, GPIO_PIN_RESET},
+  [BUTTON_SET] = {SET_GPIO_Port, SET_Pin, GPIO_PIN_RESET}
+};
+
+void button_init(void)
 {
   for (uint8_t i = 0U; i < BUTTON_COUNT; ++i)
   {
-    buttons[i].configured = (configs != NULL) && (configs[i].port != NULL);
-    buttons[i].config = buttons[i].configured
-                          ? configs[i]
-                          : (ButtonConfig){NULL, 0U, GPIO_PIN_RESET};
+    buttons[i].configured = button_configs[i].port != NULL;
+    buttons[i].config = button_configs[i];
     buttons[i].previous_raw = GPIO_PIN_SET;
     buttons[i].stable_state = GPIO_PIN_SET;
     buttons[i].matching_samples = 0U;

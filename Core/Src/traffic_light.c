@@ -1,4 +1,5 @@
 #include "traffic_light.h"
+#include "main.h"
 
 /*
  * This module is the only application module that may write traffic LEDs and
@@ -9,6 +10,12 @@
 static TrafficColor road_colors[2];
 static uint8_t displayed_values[4];
 
+#define ALL_TRAFFIC_LED_PINS (NS_RED_Pin | NS_YELLOW_Pin | NS_GREEN_Pin | \
+                              EW_RED_Pin | EW_YELLOW_Pin | EW_GREEN_Pin)
+#define ALL_DIGIT_ENABLE_PINS (EN0_Pin | EN1_Pin | EN2_Pin | EN3_Pin)
+#define ALL_SEGMENT_PINS (SEG_A_Pin | SEG_B_Pin | SEG_C_Pin | SEG_D_Pin | \
+                          SEG_E_Pin | SEG_F_Pin | SEG_G_Pin)
+
 void traffic_light_init(void)
 {
   road_colors[TRAFFIC_NORTH_SOUTH] = TRAFFIC_RED;
@@ -18,7 +25,9 @@ void traffic_light_init(void)
 
 void traffic_light_all_off(void)
 {
-  /* TODO: turn off all 12 traffic LEDs and all four seven-segment digits. */
+  HAL_GPIO_WritePin(GPIOA, ALL_TRAFFIC_LED_PINS, GPIO_PIN_RESET);
+  HAL_GPIO_WritePin(GPIOA, ALL_DIGIT_ENABLE_PINS, GPIO_PIN_SET);
+  HAL_GPIO_WritePin(GPIOB, ALL_SEGMENT_PINS, GPIO_PIN_SET);
 }
 
 void traffic_light_set_road(TrafficRoad road, TrafficColor color)
@@ -29,14 +38,39 @@ void traffic_light_set_road(TrafficRoad road, TrafficColor color)
   }
 
   road_colors[road] = color;
-  /* TODO: apply road_colors to the 12 traffic-light GPIOs. */
+
+  uint16_t road_pins = (road == TRAFFIC_NORTH_SOUTH)
+                         ? (NS_RED_Pin | NS_YELLOW_Pin | NS_GREEN_Pin)
+                         : (EW_RED_Pin | EW_YELLOW_Pin | EW_GREEN_Pin);
+  uint16_t active_pin = 0U;
+
+  if (road == TRAFFIC_NORTH_SOUTH)
+  {
+    active_pin = (color == TRAFFIC_RED) ? NS_RED_Pin
+                 : (color == TRAFFIC_AMBER) ? NS_YELLOW_Pin
+                                             : NS_GREEN_Pin;
+  }
+  else
+  {
+    active_pin = (color == TRAFFIC_RED) ? EW_RED_Pin
+                 : (color == TRAFFIC_AMBER) ? EW_YELLOW_Pin
+                                             : EW_GREEN_Pin;
+  }
+
+  HAL_GPIO_WritePin(GPIOA, road_pins, GPIO_PIN_RESET);
+  HAL_GPIO_WritePin(GPIOA, active_pin, GPIO_PIN_SET);
 }
 
 void traffic_light_set_blink(TrafficColor color, bool visible)
 {
-  (void)color;
-  (void)visible;
-  /* TODO: show or hide all four LEDs of the selected color. */
+  uint16_t color_pins = (color == TRAFFIC_RED)
+                          ? (NS_RED_Pin | EW_RED_Pin)
+                          : (color == TRAFFIC_AMBER)
+                              ? (NS_YELLOW_Pin | EW_YELLOW_Pin)
+                              : (NS_GREEN_Pin | EW_GREEN_Pin);
+
+  HAL_GPIO_WritePin(GPIOA, color_pins,
+                    visible ? GPIO_PIN_SET : GPIO_PIN_RESET);
 }
 
 void traffic_light_display_times(uint8_t north_south, uint8_t east_west)
