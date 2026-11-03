@@ -12,13 +12,37 @@
 
 static uint8_t candidate_value;
 static bool blink_visible;
-static bool setting_entry_flag;
 
 void fsm_setting_init(void)
 {
-  setting_entry_flag = true;
-  blink_visible = false;
-  setTimer(0);
+  blink_visible = true;
+
+  switch (global_get_mode())
+  {
+    case MODE_SET_RED:
+      candidate_value = global_get_duration(TRAFFIC_RED);
+      traffic_light_show_setting(TRAFFIC_RED, 2U, candidate_value,
+                                 blink_visible);
+      break;
+
+    case MODE_SET_AMBER:
+      candidate_value = global_get_duration(TRAFFIC_AMBER);
+      traffic_light_show_setting(TRAFFIC_AMBER, 3U, candidate_value,
+                                 blink_visible);
+      break;
+
+    case MODE_SET_GREEN:
+      candidate_value = global_get_duration(TRAFFIC_GREEN);
+      traffic_light_show_setting(TRAFFIC_GREEN, 4U, candidate_value,
+                                 blink_visible);
+      break;
+
+    case MODE_AUTOMATIC:
+    default:
+      break;
+  }
+
+  setTimer(SETTING_BLINK_HALF_PERIOD_MS);
 }
 
 void fsm_setting_run(void)
@@ -29,16 +53,6 @@ void fsm_setting_run(void)
   switch (global_get_mode())
   {
     case MODE_SET_RED:
-      if (setting_entry_flag)
-      {
-        candidate_value = global_get_duration(TRAFFIC_RED);
-        blink_visible = true;
-        traffic_light_all_off();
-        traffic_light_set_blink(TRAFFIC_RED, blink_visible);
-        traffic_light_display_setting(2U, candidate_value);
-        setTimer(SETTING_BLINK_HALF_PERIOD_MS);
-        setting_entry_flag = false;
-      }
       if (modify_pressed)
       {
         ++candidate_value;
@@ -54,23 +68,13 @@ void fsm_setting_run(void)
       if (timer_flag == 1)
       {
         blink_visible = !blink_visible;
-        traffic_light_set_blink(TRAFFIC_RED, blink_visible);
         setTimer(SETTING_BLINK_HALF_PERIOD_MS);
       }
-      traffic_light_display_setting(2U, candidate_value);
+      traffic_light_show_setting(TRAFFIC_RED, 2U, candidate_value,
+                                 blink_visible);
       break;
 
     case MODE_SET_AMBER:
-      if (setting_entry_flag)
-      {
-        candidate_value = global_get_duration(TRAFFIC_AMBER);
-        blink_visible = true;
-        traffic_light_all_off();
-        traffic_light_set_blink(TRAFFIC_AMBER, blink_visible);
-        traffic_light_display_setting(3U, candidate_value);
-        setTimer(SETTING_BLINK_HALF_PERIOD_MS);
-        setting_entry_flag = false;
-      }
       if (modify_pressed)
       {
         ++candidate_value;
@@ -86,23 +90,13 @@ void fsm_setting_run(void)
       if (timer_flag == 1)
       {
         blink_visible = !blink_visible;
-        traffic_light_set_blink(TRAFFIC_AMBER, blink_visible);
         setTimer(SETTING_BLINK_HALF_PERIOD_MS);
       }
-      traffic_light_display_setting(3U, candidate_value);
+      traffic_light_show_setting(TRAFFIC_AMBER, 3U, candidate_value,
+                                 blink_visible);
       break;
 
     case MODE_SET_GREEN:
-      if (setting_entry_flag)
-      {
-        candidate_value = global_get_duration(TRAFFIC_GREEN);
-        blink_visible = true;
-        traffic_light_all_off();
-        traffic_light_set_blink(TRAFFIC_GREEN, blink_visible);
-        traffic_light_display_setting(4U, candidate_value);
-        setTimer(SETTING_BLINK_HALF_PERIOD_MS);
-        setting_entry_flag = false;
-      }
       if (modify_pressed)
       {
         ++candidate_value;
@@ -118,10 +112,10 @@ void fsm_setting_run(void)
       if (timer_flag == 1)
       {
         blink_visible = !blink_visible;
-        traffic_light_set_blink(TRAFFIC_GREEN, blink_visible);
         setTimer(SETTING_BLINK_HALF_PERIOD_MS);
       }
-      traffic_light_display_setting(4U, candidate_value);
+      traffic_light_show_setting(TRAFFIC_GREEN, 4U, candidate_value,
+                                 blink_visible);
       break;
 
     case MODE_AUTOMATIC:

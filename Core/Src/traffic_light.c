@@ -7,7 +7,6 @@
  * generated the final Lab 3 pin names.
  */
 
-static TrafficColor road_colors[2];
 static volatile uint8_t displayed_values[4];
 static uint8_t scan_index;
 
@@ -37,52 +36,45 @@ static const uint16_t digit_enable_pins[4] = {
 
 void traffic_light_init(void)
 {
-  road_colors[TRAFFIC_NORTH_SOUTH] = TRAFFIC_RED;
-  road_colors[TRAFFIC_EAST_WEST] = TRAFFIC_RED;
   scan_index = 0U;
-  traffic_light_display_clear();
-  traffic_light_all_off();
-}
-
-void traffic_light_all_off(void)
-{
+  for (uint8_t i = 0U; i < 4U; ++i)
+  {
+    displayed_values[i] = DISPLAY_BLANK;
+  }
   HAL_GPIO_WritePin(GPIOA, ALL_TRAFFIC_LED_PINS, GPIO_PIN_RESET);
   HAL_GPIO_WritePin(GPIOA, ALL_DIGIT_ENABLE_PINS, GPIO_PIN_SET);
   HAL_GPIO_WritePin(GPIOB, ALL_SEGMENT_PINS, GPIO_PIN_SET);
 }
 
-void traffic_light_set_road(TrafficRoad road, TrafficColor color)
+void traffic_light_show_automatic(TrafficColor north_south_color,
+                                  TrafficColor east_west_color,
+                                  uint8_t north_south_time,
+                                  uint8_t east_west_time)
 {
-  if (road > TRAFFIC_EAST_WEST)
-  {
-    return;
-  }
+  uint16_t north_south_pin = (north_south_color == TRAFFIC_RED)
+                               ? NS_RED_Pin
+                               : (north_south_color == TRAFFIC_AMBER)
+                                   ? NS_YELLOW_Pin
+                                   : NS_GREEN_Pin;
+  uint16_t east_west_pin = (east_west_color == TRAFFIC_RED)
+                             ? EW_RED_Pin
+                             : (east_west_color == TRAFFIC_AMBER)
+                                 ? EW_YELLOW_Pin
+                                 : EW_GREEN_Pin;
 
-  road_colors[road] = color;
+  HAL_GPIO_WritePin(GPIOA, ALL_TRAFFIC_LED_PINS, GPIO_PIN_RESET);
+  HAL_GPIO_WritePin(GPIOA, north_south_pin | east_west_pin, GPIO_PIN_SET);
 
-  uint16_t road_pins = (road == TRAFFIC_NORTH_SOUTH)
-                         ? (NS_RED_Pin | NS_YELLOW_Pin | NS_GREEN_Pin)
-                         : (EW_RED_Pin | EW_YELLOW_Pin | EW_GREEN_Pin);
-  uint16_t active_pin = 0U;
-
-  if (road == TRAFFIC_NORTH_SOUTH)
-  {
-    active_pin = (color == TRAFFIC_RED) ? NS_RED_Pin
-                 : (color == TRAFFIC_AMBER) ? NS_YELLOW_Pin
-                                             : NS_GREEN_Pin;
-  }
-  else
-  {
-    active_pin = (color == TRAFFIC_RED) ? EW_RED_Pin
-                 : (color == TRAFFIC_AMBER) ? EW_YELLOW_Pin
-                                             : EW_GREEN_Pin;
-  }
-
-  HAL_GPIO_WritePin(GPIOA, road_pins, GPIO_PIN_RESET);
-  HAL_GPIO_WritePin(GPIOA, active_pin, GPIO_PIN_SET);
+  north_south_time %= 100U;
+  east_west_time %= 100U;
+  displayed_values[0] = north_south_time / 10U;
+  displayed_values[1] = north_south_time % 10U;
+  displayed_values[2] = east_west_time / 10U;
+  displayed_values[3] = east_west_time % 10U;
 }
 
-void traffic_light_set_blink(TrafficColor color, bool visible)
+void traffic_light_show_setting(TrafficColor color, uint8_t mode,
+                                uint8_t value, bool visible)
 {
   uint16_t color_pins = (color == TRAFFIC_RED)
                           ? (NS_RED_Pin | EW_RED_Pin)
@@ -90,36 +82,18 @@ void traffic_light_set_blink(TrafficColor color, bool visible)
                               ? (NS_YELLOW_Pin | EW_YELLOW_Pin)
                               : (NS_GREEN_Pin | EW_GREEN_Pin);
 
-  HAL_GPIO_WritePin(GPIOA, color_pins,
-                    visible ? GPIO_PIN_SET : GPIO_PIN_RESET);
-}
+  HAL_GPIO_WritePin(GPIOA, ALL_TRAFFIC_LED_PINS, GPIO_PIN_RESET);
+  if (visible)
+  {
+    HAL_GPIO_WritePin(GPIOA, color_pins, GPIO_PIN_SET);
+  }
 
-void traffic_light_display_times(uint8_t north_south, uint8_t east_west)
-{
-  north_south %= 100U;
-  east_west %= 100U;
-  displayed_values[0] = north_south / 10U;
-  displayed_values[1] = north_south % 10U;
-  displayed_values[2] = east_west / 10U;
-  displayed_values[3] = east_west % 10U;
-}
-
-void traffic_light_display_setting(uint8_t mode, uint8_t value)
-{
   mode %= 100U;
   value %= 100U;
   displayed_values[0] = mode / 10U;
   displayed_values[1] = mode % 10U;
   displayed_values[2] = value / 10U;
   displayed_values[3] = value % 10U;
-}
-
-void traffic_light_display_clear(void)
-{
-  for (uint8_t i = 0U; i < 4U; ++i)
-  {
-    displayed_values[i] = DISPLAY_BLANK;
-  }
 }
 
 void traffic_light_refresh_10ms(void)
