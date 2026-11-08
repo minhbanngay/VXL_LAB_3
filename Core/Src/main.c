@@ -23,7 +23,10 @@
 /* USER CODE BEGIN Includes */
 
 #include "button.h"
+#include "display.h"
+#include "fsm_automatic.h"
 #include "fsm_manual.h"
+#include "fsm_setting.h"
 #include "global.h"
 #include "software_timer.h"
 #include "traffic_light.h"
@@ -100,6 +103,7 @@ int main(void)
   global_init();
   button_init();
   traffic_light_init();
+  display_init();
   fsm_manual_init();
 
   if (HAL_TIM_Base_Start_IT(&htim2) != HAL_OK)
@@ -117,6 +121,8 @@ int main(void)
 
     /* USER CODE BEGIN 3 */
     fsm_manual_run();
+    fsm_automatic_run();
+    fsm_setting_run();
   }
   /* USER CODE END 3 */
 }
@@ -266,7 +272,7 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
   {
     timerRun();
     button_tick();
-    traffic_light_refresh_10ms();
+    display_refresh_10ms();
   }
 }
 

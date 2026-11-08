@@ -14,8 +14,6 @@ typedef enum
 
 void button_init(void);
 void button_tick(void);
-bool button_is_pressed(ButtonId button);
 bool button_was_pressed(ButtonId button);
-bool button_was_long_pressed(ButtonId button);
 
 #endif /* BUTTON_H */

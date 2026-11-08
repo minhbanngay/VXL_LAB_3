@@ -1,57 +1,34 @@
 #include "button.h"
 #include "main.h"
 
-#include <stddef.h>
-
 #define BUTTON_DEBOUNCE_SAMPLES 2U
-#define BUTTON_LONG_PRESS_TICKS 100U
 
-typedef struct
-{
-  GPIO_TypeDef *port;
-  uint16_t pin;
-  GPIO_PinState pressed_level;
-} ButtonConfig;
-
-typedef struct
-{
-  ButtonConfig config;
-  GPIO_PinState previous_raw;
-  volatile GPIO_PinState stable_state;
-  uint8_t matching_samples;
-  uint16_t pressed_ticks;
-  volatile bool press_event;
-  volatile bool long_press_event;
-  bool configured;
-} ButtonData;
-
-static ButtonData buttons[BUTTON_COUNT];
-
-static const ButtonConfig button_configs[BUTTON_COUNT] = {
-  [BUTTON_MODE] = {MODE_GPIO_Port, MODE_Pin, GPIO_PIN_RESET},
-  [BUTTON_MODIFY] = {MODIFY_GPIO_Port, MODIFY_Pin, GPIO_PIN_RESET},
-  [BUTTON_SET] = {SET_GPIO_Port, SET_Pin, GPIO_PIN_RESET}
+static GPIO_TypeDef * const button_ports[BUTTON_COUNT] = {
+  MODE_GPIO_Port,
+  MODIFY_GPIO_Port,
+  SET_GPIO_Port
 };
+
+static const uint16_t button_pins[BUTTON_COUNT] = {
+  MODE_Pin,
+  MODIFY_Pin,
+  SET_Pin
+};
+
+static GPIO_PinState stable_state[BUTTON_COUNT];
+static GPIO_PinState last_raw_state[BUTTON_COUNT];
+static uint8_t matching_samples[BUTTON_COUNT];
+static volatile uint8_t button_events;
 
 void button_init(void)
 {
+  button_events = 0U;
+
   for (uint8_t i = 0U; i < BUTTON_COUNT; ++i)
   {
-    buttons[i].configured = button_configs[i].port != NULL;
-    buttons[i].config = button_configs[i];
-    buttons[i].previous_raw = GPIO_PIN_SET;
-    buttons[i].stable_state = GPIO_PIN_SET;
-    buttons[i].matching_samples = 0U;
-    buttons[i].pressed_ticks = 0U;
-    buttons[i].press_event = false;
-    buttons[i].long_press_event = false;
-
-    if (buttons[i].configured)
-    {
-      buttons[i].previous_raw = HAL_GPIO_ReadPin(buttons[i].config.port,
-                                                 buttons[i].config.pin);
-      buttons[i].stable_state = buttons[i].previous_raw;
-    }
+    stable_state[i] = HAL_GPIO_ReadPin(button_ports[i], button_pins[i]);
+    last_raw_state[i] = stable_state[i];
+    matching_samples[i] = 0U;
   }
 }
 
@@ -59,82 +36,49 @@ void button_tick(void)
 {
   for (uint8_t i = 0U; i < BUTTON_COUNT; ++i)
   {
-    if (!buttons[i].configured)
-    {
-      continue;
-    }
+    GPIO_PinState raw_state =
+        HAL_GPIO_ReadPin(button_ports[i], button_pins[i]);
 
-    GPIO_PinState raw = HAL_GPIO_ReadPin(buttons[i].config.port,
-                                         buttons[i].config.pin);
-
-    if (raw == buttons[i].previous_raw)
+    if (raw_state == last_raw_state[i])
     {
-      if (buttons[i].matching_samples < BUTTON_DEBOUNCE_SAMPLES)
+      if (matching_samples[i] < BUTTON_DEBOUNCE_SAMPLES)
       {
-        ++buttons[i].matching_samples;
+        ++matching_samples[i];
       }
     }
     else
     {
-      buttons[i].previous_raw = raw;
-      buttons[i].matching_samples = 1U;
+      last_raw_state[i] = raw_state;
+      matching_samples[i] = 1U;
     }
 
-    if ((buttons[i].matching_samples >= BUTTON_DEBOUNCE_SAMPLES) &&
-        (buttons[i].stable_state != raw))
+    if ((matching_samples[i] >= BUTTON_DEBOUNCE_SAMPLES) &&
+        (stable_state[i] != raw_state))
     {
-      buttons[i].stable_state = raw;
-      buttons[i].pressed_ticks = 0U;
+      stable_state[i] = raw_state;
 
-      if (raw == buttons[i].config.pressed_level)
+      if (raw_state == GPIO_PIN_RESET)
       {
-        buttons[i].press_event = true;
+        button_events |= (uint8_t)(1U << i);
       }
-    }
-
-    if (buttons[i].stable_state == buttons[i].config.pressed_level)
-    {
-      if (buttons[i].pressed_ticks < BUTTON_LONG_PRESS_TICKS)
-      {
-        ++buttons[i].pressed_ticks;
-      }
-      else if (buttons[i].pressed_ticks == BUTTON_LONG_PRESS_TICKS)
-      {
-        buttons[i].long_press_event = true;
-        ++buttons[i].pressed_ticks;
-      }
-    }
-    else
-    {
-      buttons[i].pressed_ticks = 0U;
     }
   }
-}
-
-bool button_is_pressed(ButtonId button)
-{
-  return (button < BUTTON_COUNT) && buttons[button].configured &&
-         (buttons[button].stable_state == buttons[button].config.pressed_level);
 }
 
 bool button_was_pressed(ButtonId button)
 {
-  if ((button >= BUTTON_COUNT) || !buttons[button].press_event)
+  if (button >= BUTTON_COUNT)
   {
     return false;
   }
 
-  buttons[button].press_event = false;
-  return true;
-}
+  uint8_t event_mask = (uint8_t)(1U << button);
 
-bool button_was_long_pressed(ButtonId button)
-{
-  if ((button >= BUTTON_COUNT) || !buttons[button].long_press_event)
+  if ((button_events & event_mask) == 0U)
   {
     return false;
   }
 
-  buttons[button].long_press_event = false;
+  button_events &= (uint8_t)(~event_mask);
   return true;
 }
