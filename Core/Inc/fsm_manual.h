@@ -1,7 +1,9 @@
-#ifndef FSM_MANUAL_H
-#define FSM_MANUAL_H
+#ifndef INC_FSM_MANUAL_H_
+#define INC_FSM_MANUAL_H_
+
+#include "global.h"
 
 void fsm_manual_init(void);
 void fsm_manual_run(void);
 
-#endif /* FSM_MANUAL_H */
+#endif /* INC_FSM_MANUAL_H_ */

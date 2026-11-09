@@ -1,41 +1,50 @@
+/* The existing Proteus circuit uses active-high traffic LEDs. */
 #include "traffic_light.h"
-#include "main.h"
 
-#define ALL_TRAFFIC_LED_PINS (NS_RED_Pin | NS_YELLOW_Pin | NS_GREEN_Pin | \
-                              EW_RED_Pin | EW_YELLOW_Pin | EW_GREEN_Pin)
+#define A_RED     NS_RED_Pin
+#define A_AMBER     NS_YELLOW_Pin
+#define A_GREEN     NS_GREEN_Pin
 
-void traffic_light_init(void)
+#define B_RED     EW_RED_Pin
+#define B_AMBER     EW_YELLOW_Pin
+#define B_GREEN     EW_GREEN_Pin
+
+#define ALL_TRAFFIC_PINS \
+    (A_RED | A_AMBER | A_GREEN | \
+     B_RED | B_AMBER | B_GREEN)
+
+void Traffic_Init(void)
 {
-  HAL_GPIO_WritePin(GPIOA, ALL_TRAFFIC_LED_PINS, GPIO_PIN_RESET);
+    HAL_GPIO_WritePin(
+        GPIOA, ALL_TRAFFIC_PINS, GPIO_PIN_RESET);
 }
 
-void traffic_light_show(TrafficColor north_south_color,
-                        TrafficColor east_west_color)
+void Traffic_Show(TrafficColor a, TrafficColor b)
 {
-  uint16_t active_pins = 0U;
+    uint16_t pins = 0;
 
-  switch (north_south_color)
-  {
-    case TRAFFIC_RED:   active_pins |= NS_RED_Pin;    break;
-    case TRAFFIC_AMBER: active_pins |= NS_YELLOW_Pin; break;
-    case TRAFFIC_GREEN: active_pins |= NS_GREEN_Pin;  break;
-    case TRAFFIC_OFF:
-    default: break;
-  }
+    switch (a)
+    {
+        case COLOR_RED:    pins |= A_RED;   break;
+        case COLOR_AMBER:  pins |= A_AMBER; break;
+        case COLOR_GREEN:  pins |= A_GREEN; break;
+        default: break;
+    }
 
-  switch (east_west_color)
-  {
-    case TRAFFIC_RED:   active_pins |= EW_RED_Pin;    break;
-    case TRAFFIC_AMBER: active_pins |= EW_YELLOW_Pin; break;
-    case TRAFFIC_GREEN: active_pins |= EW_GREEN_Pin;  break;
-    case TRAFFIC_OFF:
-    default: break;
-  }
+    switch (b)
+    {
+        case COLOR_RED:    pins |= B_RED;   break;
+        case COLOR_AMBER:  pins |= B_AMBER; break;
+        case COLOR_GREEN:  pins |= B_GREEN; break;
+        default: break;
+    }
 
-  HAL_GPIO_WritePin(GPIOA, ALL_TRAFFIC_LED_PINS, GPIO_PIN_RESET);
+    HAL_GPIO_WritePin(
+        GPIOA, ALL_TRAFFIC_PINS, GPIO_PIN_RESET);
 
-  if (active_pins != 0U)
-  {
-    HAL_GPIO_WritePin(GPIOA, active_pins, GPIO_PIN_SET);
-  }
+    if (pins != 0)
+    {
+        HAL_GPIO_WritePin(
+            GPIOA, pins, GPIO_PIN_SET);
+    }
 }

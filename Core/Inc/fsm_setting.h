@@ -1,7 +1,8 @@
-#ifndef FSM_SETTING_H
-#define FSM_SETTING_H
+#ifndef INC_FSM_SETTING_H_
+#define INC_FSM_SETTING_H_
 
-void fsm_setting_init(void);
+#include "global.h"
+
 void fsm_setting_run(void);
 
-#endif /* FSM_SETTING_H */
+#endif /* INC_FSM_SETTING_H_ */

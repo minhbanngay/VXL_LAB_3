@@ -1,44 +1,43 @@
-#ifndef GLOBAL_H
-#define GLOBAL_H
+/* Application structure adapted from:
+ * https://github.com/manhphamduy13/MicroController_Lab3
+ */
+#ifndef INC_GLOBAL_H_
+#define INC_GLOBAL_H_
 
-#include <stdbool.h>
+#include "main.h"
+#include "software_timer.h"
+#include "buttons.h"
+#include "display.h"
+#include "traffic_light.h"
 #include <stdint.h>
 
-#define SYSTEM_TICK_MS 10U
-#define TRAFFIC_TIME_MIN_SECONDS 1U
-#define TRAFFIC_TIME_MAX_SECONDS 99U
+#define INIT                     0
 
-typedef enum
-{
-  MODE_AUTOMATIC = 1,
-  MODE_SET_RED,
-  MODE_SET_AMBER,
-  MODE_SET_GREEN
-} SystemMode;
+#define AUTO_RED_GREEN           1
+#define AUTO_RED_AMBER           2
+#define AUTO_GREEN_RED           3
+#define AUTO_AMBER_RED           4
 
-typedef enum
-{
-  TRAFFIC_OFF = 0,
-  TRAFFIC_RED,
-  TRAFFIC_AMBER,
-  TRAFFIC_GREEN
-} TrafficColor;
+#define SET_RED                  12
+#define SET_AMBER                13
+#define SET_GREEN                14
 
-typedef struct
-{
-  uint8_t red_seconds;
-  uint8_t amber_seconds;
-  uint8_t green_seconds;
-} TrafficTiming;
+#define MANUAL_RED_GREEN         21
+#define MANUAL_RED_AMBER         22
+#define MANUAL_GREEN_RED         23
+#define MANUAL_AMBER_RED         24
 
-void global_init(void);
+extern int status;
 
-SystemMode global_get_mode(void);
-void global_set_mode(SystemMode mode);
-void global_next_mode(void);
+extern int time_red;
+extern int time_amber;
+extern int time_green;
 
-TrafficTiming global_get_timing(void);
-uint8_t global_get_duration(TrafficColor color);
-bool global_set_duration(TrafficColor color, uint8_t seconds);
+extern int countA;
+extern int countB;
 
-#endif /* GLOBAL_H */
+extern int temp_red;
+extern int temp_amber;
+extern int temp_green;
+
+#endif /* INC_GLOBAL_H_ */

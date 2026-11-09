@@ -1,62 +1,76 @@
 #include "display.h"
-#include "main.h"
+#include "software_timer.h"
 
-#define ALL_DIGIT_ENABLE_PINS (EN0_Pin | EN1_Pin | EN2_Pin | EN3_Pin)
-#define ALL_SEGMENT_PINS (SEG_A_Pin | SEG_B_Pin | SEG_C_Pin | SEG_D_Pin | \
-                          SEG_E_Pin | SEG_F_Pin | SEG_G_Pin)
-
-static volatile uint8_t display_digits[4];
-static uint8_t scan_index;
-
-static const uint16_t digit_segments[10] = {
-  SEG_A_Pin | SEG_B_Pin | SEG_C_Pin | SEG_D_Pin | SEG_E_Pin | SEG_F_Pin,
-  SEG_B_Pin | SEG_C_Pin,
-  SEG_A_Pin | SEG_B_Pin | SEG_D_Pin | SEG_E_Pin | SEG_G_Pin,
-  SEG_A_Pin | SEG_B_Pin | SEG_C_Pin | SEG_D_Pin | SEG_G_Pin,
-  SEG_B_Pin | SEG_C_Pin | SEG_F_Pin | SEG_G_Pin,
-  SEG_A_Pin | SEG_C_Pin | SEG_D_Pin | SEG_F_Pin | SEG_G_Pin,
-  SEG_A_Pin | SEG_C_Pin | SEG_D_Pin | SEG_E_Pin | SEG_F_Pin | SEG_G_Pin,
-  SEG_A_Pin | SEG_B_Pin | SEG_C_Pin,
-  ALL_SEGMENT_PINS,
-  SEG_A_Pin | SEG_B_Pin | SEG_C_Pin | SEG_D_Pin | SEG_F_Pin | SEG_G_Pin
+static const uint8_t SEG_CODE[10] = {
+    0x40,
+    0x79,
+    0x24,
+    0x30,
+    0x19,
+    0x12,
+    0x02,
+    0x78,
+    0x00,
+    0x10
 };
 
-static const uint16_t digit_enable_pins[4] = {
-  EN0_Pin, EN1_Pin, EN2_Pin, EN3_Pin
+static const uint16_t digit_pins[4] = {
+    EN0_Pin, EN1_Pin,
+    EN2_Pin, EN3_Pin
 };
 
-void display_init(void)
+static uint8_t digits[4] = {0, 0, 0, 0};
+static uint8_t scan_index = 0;
+
+#define SCAN_TIME_MS    10
+
+static void Display_AllOff(void)
 {
-  scan_index = 0U;
-  display_set(0U, 0U);
-  HAL_GPIO_WritePin(GPIOA, ALL_DIGIT_ENABLE_PINS, GPIO_PIN_SET);
-  HAL_GPIO_WritePin(GPIOB, ALL_SEGMENT_PINS, GPIO_PIN_SET);
+    HAL_GPIO_WritePin(GPIOA,
+        EN0_Pin | EN1_Pin | EN2_Pin | EN3_Pin,
+        GPIO_PIN_SET);
 }
 
-void display_set(uint8_t left, uint8_t right)
+void Display_Init(void)
 {
-  left %= 100U;
-  right %= 100U;
+    Display_AllOff();
+    Display_Set(0, 0);
+    scan_index = 0;
 
-  display_digits[0] = left / 10U;
-  display_digits[1] = left % 10U;
-  display_digits[2] = right / 10U;
-  display_digits[3] = right % 10U;
+    setTimer(2, SCAN_TIME_MS);
+    timer_flag[2] = 1;
 }
 
-void display_refresh_10ms(void)
+void Display_Set(int left, int right)
 {
-  HAL_GPIO_WritePin(GPIOA, ALL_DIGIT_ENABLE_PINS, GPIO_PIN_SET);
-  HAL_GPIO_WritePin(GPIOB, ALL_SEGMENT_PINS, GPIO_PIN_SET);
+    if (left < 0) left = 0;
+    if (left > 99) left = 99;
+    if (right < 0) right = 0;
+    if (right > 99) right = 99;
 
-  HAL_GPIO_WritePin(GPIOB, digit_segments[display_digits[scan_index]],
-                    GPIO_PIN_RESET);
-  HAL_GPIO_WritePin(GPIOA, digit_enable_pins[scan_index], GPIO_PIN_RESET);
-
-  ++scan_index;
-  if (scan_index >= 4U)
-  {
-    scan_index = 0U;
-  }
+    digits[0] = (uint8_t)(left / 10);
+    digits[1] = (uint8_t)(left % 10);
+    digits[2] = (uint8_t)(right / 10);
+    digits[3] = (uint8_t)(right % 10);
 }
 
+void display(void)
+{
+    if (timer_flag[2] == 1)
+    {
+        timer_flag[2] = 0;
+        setTimer(2, SCAN_TIME_MS);
+
+        Display_AllOff();
+
+        uint8_t code = SEG_CODE[digits[scan_index]];
+        GPIOB->BSRR = (uint32_t)(code & 0x7F);
+        GPIOB->BRR  = (uint32_t)((~code) & 0x7F);
+
+        HAL_GPIO_WritePin(GPIOA, digit_pins[scan_index], GPIO_PIN_RESET);
+
+        scan_index++;
+        if (scan_index >= 4)
+            scan_index = 0;
+    }
+}

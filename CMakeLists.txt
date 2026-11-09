@@ -46,7 +46,7 @@ target_link_directories(${CMAKE_PROJECT_NAME} PRIVATE
 target_sources(${CMAKE_PROJECT_NAME} PRIVATE
     Core/Src/global.c
     Core/Src/software_timer.c
-    Core/Src/button.c
+    Core/Src/buttons.c
     Core/Src/traffic_light.c
     Core/Src/display.c
     Core/Src/fsm_manual.c

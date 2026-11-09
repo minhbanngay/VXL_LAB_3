@@ -1,43 +1,98 @@
 #include "fsm_manual.h"
-
-#include "button.h"
 #include "fsm_automatic.h"
-#include "fsm_setting.h"
-#include "global.h"
 
 void fsm_manual_init(void)
 {
-  fsm_automatic_init();
+    status = MANUAL_RED_GREEN;
+    Traffic_Show(COLOR_RED, COLOR_GREEN);
+    Display_Set(1, 1);
 }
 
 void fsm_manual_run(void)
 {
-  if (!button_was_pressed(BUTTON_MODE))
-  {
-    return;
-  }
+    switch (status)
+    {
+        case MANUAL_RED_GREEN:
+            Traffic_Show(COLOR_RED, COLOR_GREEN);
+            Display_Set(1, 1);
 
-  switch (global_get_mode())
-  {
-    case MODE_AUTOMATIC:
-      global_set_mode(MODE_SET_RED);
-      fsm_setting_init();
-      break;
+            if (isButton3Pressed())
+            {
+                status = MANUAL_RED_AMBER;
+            }
+            if (isButton1Pressed())
+            {
+                status = SET_RED;
+                temp_red = time_red;
+                setTimer(0, 250);
+            }
+            if (isButton2Pressed())
+            {
+                fsm_automatic_init();
+            }
+            break;
 
-    case MODE_SET_RED:
-      global_set_mode(MODE_SET_AMBER);
-      fsm_setting_init();
-      break;
+        case MANUAL_RED_AMBER:
+            Traffic_Show(COLOR_RED, COLOR_AMBER);
+            Display_Set(1, 2);
 
-    case MODE_SET_AMBER:
-      global_set_mode(MODE_SET_GREEN);
-      fsm_setting_init();
-      break;
+            if (isButton3Pressed())
+            {
+                status = MANUAL_GREEN_RED;
+            }
+            if (isButton1Pressed())
+            {
+                status = SET_RED;
+                temp_red = time_red;
+                setTimer(0, 250);
+            }
+            if (isButton2Pressed())
+            {
+                fsm_automatic_init();
+            }
+            break;
 
-    case MODE_SET_GREEN:
-    default:
-      global_set_mode(MODE_AUTOMATIC);
-      fsm_automatic_init();
-      break;
-  }
+        case MANUAL_GREEN_RED:
+            Traffic_Show(COLOR_GREEN, COLOR_RED);
+            Display_Set(1, 3);
+
+            if (isButton3Pressed())
+            {
+                status = MANUAL_AMBER_RED;
+            }
+            if (isButton1Pressed())
+            {
+                status = SET_RED;
+                temp_red = time_red;
+                setTimer(0, 250);
+            }
+            if (isButton2Pressed())
+            {
+                fsm_automatic_init();
+            }
+            break;
+
+        case MANUAL_AMBER_RED:
+            Traffic_Show(COLOR_AMBER, COLOR_RED);
+            Display_Set(1, 4);
+
+            if (isButton3Pressed())
+            {
+                status = MANUAL_RED_GREEN;
+            }
+            if (isButton1Pressed())
+            {
+                status = SET_RED;
+                temp_red = time_red;
+                setTimer(0, 250);
+            }
+            if (isButton2Pressed())
+            {
+                fsm_automatic_init();
+            }
+            break;
+
+        default:
+            break;
+    }
 }
