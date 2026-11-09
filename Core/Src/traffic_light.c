@@ -39,8 +39,9 @@ void Traffic_Show(TrafficColor a, TrafficColor b)
         default: break;
     }
 
+    /* Keep selected LEDs high between calls; only turn off the other colors. */
     HAL_GPIO_WritePin(
-        GPIOA, ALL_TRAFFIC_PINS, GPIO_PIN_RESET);
+        GPIOA, (uint16_t)(ALL_TRAFFIC_PINS & ~pins), GPIO_PIN_RESET);
 
     if (pins != 0)
     {
