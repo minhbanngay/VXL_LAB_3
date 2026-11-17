@@ -1,22 +1,47 @@
 #include "software_timer.h"
+#include "global.h"
 
-static volatile int timer_counter = 0;
-volatile int timer_flag = 0;
+volatile int timer_counter[3] = {0};
+volatile int timer_flag[3] = {0};
 
-void setTimer(int duration)
+void setTimer(int index, int duration)
 {
-  timer_counter = duration / TIMER_CYCLE;
-  timer_flag = 0;
+    if (index >= 0 && index < 3)
+    {
+        timer_flag[index] = 0;
+        int ticks = duration / TIMER_CYCLE;
+
+        if (ticks <= 0)
+        {
+            ticks = 1;
+        }
+        timer_counter[index] = ticks;
+    }
 }
 
 void timerRun(void)
 {
-  if (timer_counter > 0)
-  {
-    --timer_counter;
-    if (timer_counter == 0)
+    for (int i = 0; i < 3; i++)
     {
-      timer_flag = 1;
+        if (timer_counter[i] > 0)
+        {
+            timer_counter[i]--;
+            if (timer_counter[i] <= 0)
+            {
+                timer_flag[i] = 1;
+            }
+        }
     }
-  }
+
+    if (timer_flag[1] == 1)
+    {
+        timer_flag[1] = 0;
+        timer_counter[1] = 1000 / TIMER_CYCLE;
+
+        if (status >= AUTO_RED_GREEN && status <= AUTO_AMBER_RED)
+        {
+            if (countA > 0) countA--;
+            if (countB > 0) countB--;
+        }
+    }
 }

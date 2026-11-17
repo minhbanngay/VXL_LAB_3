@@ -1,11 +1,12 @@
-#ifndef SOFTWARE_TIMER_H
-#define SOFTWARE_TIMER_H
+#ifndef SOFTWARE_TIMER_H_
+#define SOFTWARE_TIMER_H_
 
-#define TIMER_CYCLE 10
+#define TIMER_CYCLE    10
 
-extern volatile int timer_flag;
+extern volatile int timer_flag[3];
+extern volatile int timer_counter[3];
 
-void setTimer(int duration);
+void setTimer(int index, int duration);
 void timerRun(void);
 
-#endif /* SOFTWARE_TIMER_H */
+#endif /* SOFTWARE_TIMER_H_ */

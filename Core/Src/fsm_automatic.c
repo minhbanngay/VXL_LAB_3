@@ -1,155 +1,130 @@
 #include "fsm_automatic.h"
-
-#include "global.h"
-#include "software_timer.h"
-#include "traffic_light.h"
-
-#include <stdint.h>
-
-typedef enum
-{
-  AUTO_NS_GREEN_EW_RED = 0,
-  AUTO_NS_AMBER_EW_RED,
-  AUTO_NS_RED_EW_GREEN,
-  AUTO_NS_RED_EW_AMBER
-} AutomaticState;
-
-static AutomaticState automatic_state;
-static uint8_t north_south_countdown;
-static uint8_t east_west_countdown;
-static uint8_t phase_countdown;
+#include "fsm_manual.h"
 
 void fsm_automatic_init(void)
 {
-  TrafficTiming timing = global_get_timing();
+    status = AUTO_RED_GREEN;
+    countA = time_red;
+    countB = time_green;
 
-  automatic_state = AUTO_NS_GREEN_EW_RED;
-  north_south_countdown = timing.green_seconds;
-  east_west_countdown = timing.red_seconds;
-  phase_countdown = timing.green_seconds;
-  traffic_light_show_automatic(TRAFFIC_GREEN, TRAFFIC_RED,
-                               north_south_countdown,
-                               east_west_countdown);
-  setTimer(1000);
+    Traffic_Show(COLOR_RED, COLOR_GREEN);
+    Display_Set(countA, countB);
+
+    setTimer(0, time_green * 1000);
+    setTimer(1, 1000);
 }
 
 void fsm_automatic_run(void)
 {
-  TrafficTiming timing = global_get_timing();
+    switch (status)
+    {
+        case AUTO_RED_GREEN:
+            Traffic_Show(COLOR_RED, COLOR_GREEN);
+            Display_Set(countA, countB);
 
-  switch (automatic_state)
-  {
-    case AUTO_NS_GREEN_EW_RED:
-      if (timer_flag == 0)
-      {
-        break;
-      }
-      if (north_south_countdown > 0U) --north_south_countdown;
-      if (east_west_countdown > 0U) --east_west_countdown;
-      --phase_countdown;
-      if (phase_countdown > 0U)
-      {
-        traffic_light_show_automatic(TRAFFIC_GREEN, TRAFFIC_RED,
-                                     north_south_countdown,
-                                     east_west_countdown);
-        setTimer(1000);
-        break;
-      }
-      automatic_state = AUTO_NS_AMBER_EW_RED;
-      north_south_countdown = timing.amber_seconds;
-      phase_countdown = timing.amber_seconds;
-      traffic_light_show_automatic(TRAFFIC_AMBER, TRAFFIC_RED,
-                                   north_south_countdown,
-                                   east_west_countdown);
-      setTimer(1000);
-      break;
+            if (isButton1Pressed())
+            {
+                status = SET_RED;
+                temp_red = time_red;
+                setTimer(0, 250);
+                break;
+            }
 
-    case AUTO_NS_AMBER_EW_RED:
-      if (timer_flag == 0)
-      {
-        break;
-      }
-      if (north_south_countdown > 0U) --north_south_countdown;
-      if (east_west_countdown > 0U) --east_west_countdown;
-      --phase_countdown;
-      if (phase_countdown > 0U)
-      {
-        traffic_light_show_automatic(TRAFFIC_AMBER, TRAFFIC_RED,
-                                     north_south_countdown,
-                                     east_west_countdown);
-        setTimer(1000);
-        break;
-      }
-      automatic_state = AUTO_NS_RED_EW_GREEN;
-      north_south_countdown = timing.red_seconds;
-      east_west_countdown = timing.green_seconds;
-      phase_countdown = timing.green_seconds;
-      traffic_light_show_automatic(TRAFFIC_RED, TRAFFIC_GREEN,
-                                   north_south_countdown,
-                                   east_west_countdown);
-      setTimer(1000);
-      break;
+            if (isButton2Pressed())
+            {
+                fsm_manual_init();
+                break;
+            }
 
-    case AUTO_NS_RED_EW_GREEN:
-      if (timer_flag == 0)
-      {
-        break;
-      }
-      if (north_south_countdown > 0U) --north_south_countdown;
-      if (east_west_countdown > 0U) --east_west_countdown;
-      --phase_countdown;
-      if (phase_countdown > 0U)
-      {
-        traffic_light_show_automatic(TRAFFIC_RED, TRAFFIC_GREEN,
-                                     north_south_countdown,
-                                     east_west_countdown);
-        setTimer(1000);
-        break;
-      }
-      automatic_state = AUTO_NS_RED_EW_AMBER;
-      east_west_countdown = timing.amber_seconds;
-      phase_countdown = timing.amber_seconds;
-      traffic_light_show_automatic(TRAFFIC_RED, TRAFFIC_AMBER,
-                                   north_south_countdown,
-                                   east_west_countdown);
-      setTimer(1000);
-      break;
+            if (timer_flag[0] == 1)
+            {
+                status = AUTO_RED_AMBER;
+                countB = time_amber;
+                setTimer(0, time_amber * 1000);
+            }
+            break;
 
-    case AUTO_NS_RED_EW_AMBER:
-      if (timer_flag == 0)
-      {
-        break;
-      }
-      if (north_south_countdown > 0U) --north_south_countdown;
-      if (east_west_countdown > 0U) --east_west_countdown;
-      --phase_countdown;
-      if (phase_countdown > 0U)
-      {
-        traffic_light_show_automatic(TRAFFIC_RED, TRAFFIC_AMBER,
-                                     north_south_countdown,
-                                     east_west_countdown);
-        setTimer(1000);
-        break;
-      }
-      automatic_state = AUTO_NS_GREEN_EW_RED;
-      north_south_countdown = timing.green_seconds;
-      east_west_countdown = timing.red_seconds;
-      phase_countdown = timing.green_seconds;
-      traffic_light_show_automatic(TRAFFIC_GREEN, TRAFFIC_RED,
-                                   north_south_countdown,
-                                   east_west_countdown);
-      setTimer(1000);
-      break;
+        case AUTO_RED_AMBER:
+            Traffic_Show(COLOR_RED, COLOR_AMBER);
+            Display_Set(countA, countB);
 
-    default:
-      automatic_state = AUTO_NS_GREEN_EW_RED;
-      north_south_countdown = timing.green_seconds;
-      east_west_countdown = timing.red_seconds;
-      phase_countdown = timing.green_seconds;
-      traffic_light_show_automatic(TRAFFIC_GREEN, TRAFFIC_RED,
-                                   north_south_countdown,
-                                   east_west_countdown);
-      setTimer(1000);
-      break;
-  }
+            if (isButton1Pressed())
+            {
+                status = SET_RED;
+                temp_red = time_red;
+                setTimer(0, 250);
+                break;
+            }
+
+            if (isButton2Pressed())
+            {
+                fsm_manual_init();
+                break;
+            }
+
+            if (timer_flag[0] == 1)
+            {
+                status = AUTO_GREEN_RED;
+                countA = time_green;
+                countB = time_red;
+                setTimer(0, time_green * 1000);
+            }
+            break;
+
+        case AUTO_GREEN_RED:
+            Traffic_Show(COLOR_GREEN, COLOR_RED);
+            Display_Set(countA, countB);
+
+            if (isButton1Pressed())
+            {
+                status = SET_RED;
+                temp_red = time_red;
+                setTimer(0, 250);
+                break;
+            }
+
+            if (isButton2Pressed())
+            {
+                fsm_manual_init();
+                break;
+            }
+
+            if (timer_flag[0] == 1)
+            {
+                status = AUTO_AMBER_RED;
+                countA = time_amber;
+                setTimer(0, time_amber * 1000);
+            }
+            break;
+
+        case AUTO_AMBER_RED:
+            Traffic_Show(COLOR_AMBER, COLOR_RED);
+            Display_Set(countA, countB);
+
+            if (isButton1Pressed())
+            {
+                status = SET_RED;
+                temp_red = time_red;
+                setTimer(0, 250);
+                break;
+            }
+
+            if (isButton2Pressed())
+            {
+                fsm_manual_init();
+                break;
+            }
+
+            if (timer_flag[0] == 1)
+            {
+                status = AUTO_RED_GREEN;
+                countA = time_red;
+                countB = time_green;
+                setTimer(0, time_green * 1000);
+            }
+            break;
+
+        default:
+            break;
+    }
 }
